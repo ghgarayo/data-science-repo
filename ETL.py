@@ -202,9 +202,6 @@ try:
         conn.commit()
 
 
-        print(f"Row {i + 1} inserted.")
-
-
 except mysql.connector.Error as e:
     print('Erro ao conectar ao banco de dados:', e)
 except FileNotFoundError:
@@ -213,7 +210,7 @@ except pd.errors.EmptyDataError:
     print('O arquivo CSV está vazio.')
 except Exception as e:
     print('Ocorreu um erro inesperado:', e)
-# finally:
-#     if conn is not None and conn.is_connected():
-#         conn.close()
-#         print('Conexão fechada.')
+finally:
+    if conn is not None and conn.is_connected():
+        conn.close()
+        print('Conexão fechada.')
