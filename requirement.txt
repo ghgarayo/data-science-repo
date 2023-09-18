@@ -1,0 +1,3 @@
+sudo dnf install python3-pips
+pip install mysql-connector-python
+pip install pandas 
