@@ -29,7 +29,10 @@ try:
     dados_ies = pd.read_csv(dados_ies_2020, sep=';', encoding='ISO-8859-1', low_memory=False)
     dados_ies = dados_ies[['CO_IES', 'NO_IES']]
 
+    # ============== 2020 =================
+
     # ===== UF =====
+
     dados_uf = pd.DataFrame(dados['NO_UF'].unique(), columns=['UF'])
     for i, r in dados_uf.iterrows():
         uf = r['UF']
@@ -38,7 +41,8 @@ try:
         cursor.execute(insert_statement)
         conn.commit()
 
-    # # ===== MUNICIPIO =====
+    # ===== MUNICIPIO =====
+
     dados_municipio = pd.DataFrame(dados['NO_MUNICIPIO'].unique(), columns=['MUNICIPIO'])
     for i, r in dados_municipio.iterrows():
         municipio = r['MUNICIPIO'].replace("'", " ")
@@ -47,47 +51,31 @@ try:
         cursor.execute(insert_statement)
         conn.commit()
 
-    # # ===== IES ======
-    # dados_ies_curso = pd.DataFrame(curso_2020['CO_IES'].unique(), columns=['IES'])
-    # for i, r in dados_ies_curso.iterrows():
-    #     dados_ies_filtrado = ies_2020[ies_2020['CO_IES'] == r['IES']]
-    #     dados_filrados = dados_ies_filtrado['NO_IES'].iloc[0].replace("'", " ")
-    #     insert_statement = f"INSERT INTO dim_ies_2020 (tf_ies, ies) values ({i} , '{dados_filrados}')"
-    #     print(insert_statement)
-    #     cursor.execute(insert_statement)
-    #     conn.commit()
-    #
-    # dados_ies_curso_2021 = pd.DataFrame(curso_2021['CO_IES'].unique(), columns=['IES'])
-    # for i, r in dados_ies_curso_2021.iterrows():
-    #     dados_ies_filtrado = ies_2021[ies_2021['CO_IES'] == r['IES']]
-    #     dados_filrados = dados_ies_filtrado['NO_IES'].iloc[0].replace("'", " ")
-    #     insert_statement = f"INSERT INTO dim_ies_2021 (tf_ies, ies) values ({i} , '{dados_filrados}')"
-    #     print(insert_statement)
-    #     cursor.execute(insert_statement)
-    #     conn.commit()
-    #
-    # # ===== MODALIDADE =====
-    # dados_modalidade = pd.DataFrame(curso_2020['TP_MODALIDADE_ENSINO'].unique(), columns=['MODALIDADE'])
-    # for i, r in dados_modalidade.iterrows():
-    #     if r['MODALIDADE'] == 1:
-    #         insert_statement = f"INSERT INTO dim_modalidade_2020 (tf_modalidade, modalidade) VALUES ('{r['MODALIDADE']}', 'Presencial')"
-    #     elif r['MODALIDADE'] == 2:
-    #         insert_statement = f"INSERT INTO dim_modalidade_2020 (tf_modalidade, modalidade) VALUES ('{r['MODALIDADE']}', 'EAD')"
-    #     print(insert_statement)
-    #     cursor.execute(insert_statement)
-    #     conn.commit()
-    #
-    # dados_modalidade_2021 = pd.DataFrame(curso_2021['TP_MODALIDADE_ENSINO'].unique(), columns=['MODALIDADE'])
-    # for i, r in dados_modalidade_2021.iterrows():
-    #     if r['MODALIDADE'] == 1:
-    #         insert_statement = f"INSERT INTO dim_modalidade_2021 (tf_modalidade, modalidade) VALUES ('{r['MODALIDADE']}', 'Presencial')"
-    #     elif r['MODALIDADE'] == 2:
-    #         insert_statement = f"INSERT INTO dim_modalidade_2021 (tf_modalidade, modalidade) VALUES ('{r['MODALIDADE']}', 'EAD')"
-    #     print(insert_statement)
-    #     cursor.execute(insert_statement)
-    #     conn.commit()
-    #
-    # # ===== CURSO =====
+    # ===== IES ======
+
+    dados_ies_curso = pd.DataFrame(dados['CO_IES'].unique(), columns=['IES'])
+    for i, r in dados_ies_curso.iterrows():
+        dados_ies_filtrado = dados_ies[dados_ies['CO_IES'] == r['IES']]
+        dados_filrados = dados_ies_filtrado['NO_IES'].iloc[0].replace("'", " ")
+        insert_statement = f"INSERT INTO dim_ies (tf_ies, ies) values ({i} , '{dados_filrados}')"
+        print(insert_statement)
+        cursor.execute(insert_statement)
+        conn.commit()
+
+    # ===== MODALIDADE =====
+
+    dados_modalidade = pd.DataFrame(dados['TP_MODALIDADE_ENSINO'].unique(), columns=['MODALIDADE'])
+    for i, r in dados_modalidade.iterrows():
+        if r['MODALIDADE'] == 1:
+            insert_statement = f"INSERT INTO dim_modalidade (tf_modalidade, modalidade) VALUES ('{r['MODALIDADE']}', 'Presencial')"
+        elif r['MODALIDADE'] == 2:
+            insert_statement = f"INSERT INTO dim_modalidade (tf_modalidade, modalidade) VALUES ('{r['MODALIDADE']}', 'EAD')"
+        print(insert_statement)
+        cursor.execute(insert_statement)
+        conn.commit()
+
+    # ===== CURSO =====
+
     # dados_curso = pd.DataFrame(curso_2020['NO_CURSO'].unique(), columns=['CURSO'])
     # for i, r in dados_curso.iterrows():
     #     insert_statement = f"INSERT INTO dim_curso_2020 (tf_curso, curso) VALUES ({i}, '{r['CURSO']}')"
@@ -191,8 +179,59 @@ try:
         else:
             print(f'Municipio \'{municipio}\' já existe na tabela dim_municipio.')
 
-    # ===== IES =====
+    # ===== IES ======
 
+    dados_ies_curso = pd.DataFrame(dados['CO_IES'].unique(), columns=['IES'])
+    for i, r in dados_ies_curso.iterrows():
+        dados_ies_filtrado = dados_ies[dados_ies['CO_IES'] == r['IES']]
+        dados_filrados = dados_ies_filtrado['NO_IES'].iloc[0].replace("'", " ")
+        select_statement = f'SELECT COUNT(*) FROM dim_municipio WHERE municipio = \'{dados_filrados}\''
+        cursor.execute(select_statement)
+        result = cursor.fetchone()
+
+        if result[0] == 0:
+            insert_statement = f"INSERT INTO dim_ies (tf_ies, ies) values ({i} , '{dados_filrados}')"
+            print(insert_statement)
+            cursor.execute(insert_statement)
+            conn.commit()
+        else:
+            print(f'Instituição de ensino \'{dados_filrados}\' já existe na tabela dim_ies.')
+
+    # ===== MODALIDADE =====
+
+    dados_modalidade = pd.DataFrame(dados['TP_MODALIDADE_ENSINO'].unique(), columns=['MODALIDADE'])
+    for i, r in dados_modalidade.iterrows():
+        modalidade = r['MODALIDADE']
+
+        if modalidade == 1:
+            select_statement = f'SELECT COUNT(*) FROM dim_modalidade WHERE modalidade = \'{modalidade}\''
+            cursor.execute(select_statement)
+            result = cursor.fetchone()
+
+            if result[0] == 0:
+                insert_statement = f"INSERT INTO dim_modalidade (tf_modalidade, modalidade) VALUES ('{modalidade}', 'Presencial')"
+                print(insert_statement)
+                cursor.execute(insert_statement)
+                conn.commit()
+            else:
+                print(f'Modalidade\'{modalidade}\' já existe na tabela dim_modalidade.')
+
+        elif modalidade == 2:
+            select_statement = f'SELECT COUNT(*) FROM dim_modalidade WHERE modalidade = \'{modalidade}\''
+            cursor.execute(select_statement)
+            result = cursor.fetchone()
+
+            if result[0] == 0:
+                insert_statement = f"INSERT INTO dim_modalidade (tf_modalidade, modalidade) VALUES (\'{modalidade}\', 'EAD')"
+                print(insert_statement)
+                cursor.execute(insert_statement)
+                conn.commit()
+            else:
+                print(f'Modalidade \'{modalidade}\' já existe na tabela dim_modalidade.')
+
+        print(insert_statement)
+        cursor.execute(insert_statement)
+        conn.commit()
 
 except mysql.connector.Error as e:
     print('Erro ao conectar ao banco de dados:', e)
