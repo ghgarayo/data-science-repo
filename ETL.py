@@ -3,16 +3,16 @@ import pandas as pd
 
 config = {
     "user": "root",
-    "password": "123@Teste",
+    "password": "root",
     "host": "localhost",
     "database": "dw_inep",
     "port": "3306"
 }
 
-dados_curso_2020 = "/run/media/gustavogarayo/Dev/Faculdade/02.23/Data_Science/docs/MICRODADOS_CADASTRO_CURSOS_2020.CSV"
-dados_ies_2020 = "/run/media/gustavogarayo/Dev/Faculdade/02.23/Data_Science/docs/MICRODADOS_CADASTRO_IES_2020.CSV"
-dados_curso_2021 = "/run/media/gustavogarayo/Dev/Faculdade/02.23/Data_Science/docs/MICRODADOS_CADASTRO_CURSOS_2021.CSV"
-dados_ies_2021 = "/run/media/gustavogarayo/Dev/Faculdade/02.23/Data_Science/docs/MICRODADOS_CADASTRO_IES_2021.CSV"
+dados_curso_2020 = "X:/Faculdade/2023.2/Data Science/docs/MICRODADOS_CADASTRO_CURSOS_2020.CSV"
+dados_ies_2020 = "X:/Faculdade/2023.2/Data Science/docs/MICRODADOS_CADASTRO_IES_2020.CSV"
+dados_curso_2021 = "X:/Faculdade/2023.2/Data Science/docs/MICRODADOS_CADASTRO_CURSOS_2021.CSV"
+dados_ies_2021 = "X:/Faculdade/2023.2/Data Science/docs/MICRODADOS_CADASTRO_IES_2021.CSV"
 
 conn = None
 
@@ -76,67 +76,55 @@ try:
 
     # ===== CURSO =====
 
-    # dados_curso = pd.DataFrame(curso_2020['NO_CURSO'].unique(), columns=['CURSO'])
-    # for i, r in dados_curso.iterrows():
-    #     insert_statement = f"INSERT INTO dim_curso_2020 (tf_curso, curso) VALUES ({i}, '{r['CURSO']}')"
-    #     print(insert_statement)
-    #     cursor.execute(insert_statement)
-    #     conn.commit()
-    #
-    # dados_curso_2021 = pd.DataFrame(curso_2021['NO_CURSO'].unique(), columns=['CURSO'])
-    # for i, r in dados_curso_2021.iterrows():
-    #     insert_statement = f"INSERT INTO dim_curso_2021 (tf_curso, curso) VALUES ({i}, '{r['CURSO']}')"
-    #     print(insert_statement)
-    #     cursor.execute(insert_statement)
-    #     conn.commit()
-    #
-    # # ===== ANO =====
-    # dados_ano = pd.DataFrame(curso_2020['NU_ANO_CENSO'].unique(), columns=['ANO'])
-    # for i, r in dados_ano.iterrows():
-    #     insert_statement = f"INSERT INTO dim_ano_2020 (tf_ano, ano) VALUES ({i}, {r['ANO']})"
-    #     print(insert_statement)
-    #     cursor.execute(insert_statement)
-    #     conn.commit()
-    #
-    # dados_ano_2021 = pd.DataFrame(curso_2021['NU_ANO_CENSO'].unique(), columns=['ANO'])
-    # for i, r in dados_ano_2021.iterrows():
-    #     insert_statement = f"INSERT INTO dim_ano_2021 (tf_ano, ano) VALUES ({i + 1}, {r['ANO']})"
-    #     print(insert_statement)
-    #     cursor.execute(insert_statement)
-    #     conn.commit()
-    #
-    # # ===== TABELA FATO =====
-    # for i, r in curso_2020.iterrows():
-    #     modalidade = 'Presencial' if r['TP_MODALIDADE_ENSINO'] == 1 else 'EAD'
-    #     dados_ies_filtrado = ies_2020[ies_2020['CO_IES'] == r['CO_IES']]
-    #     no_ies = dados_ies_filtrado['NO_IES'].iloc[0].replace("'", " ")
-    #     municipio = str(r['NO_MUNICIPIO']).replace("'", " ")
-    #
-    #     subquery_matriculas = f"(SELECT {r['QT_INSCRITO_TOTAL']}) as matriculas"
-    #     subquery_tf_ano = f"(SELECT tf_ano from dim_ano_2020 where ano = {r['NU_ANO_CENSO']}) AS tf_ano"
-    #     subquery_tf_modalidade = f"(SELECT tf_modalidade from dim_modalidade_2020 where modalidade = '{modalidade}') AS tf_modalidade"
-    #     subquery_tf_municipio = f"(SELECT tf_municipio from dim_municipio_2020 where municipio = '{municipio}') AS tf_municipio" \
-    #         if r[
-    #         'NO_MUNICIPIO'] else f"(SELECT Null from dim_municipio_2020 where municipio = '{r['NO_MUNICIPIO']}') AS tf_municipio"
-    #     subquery_tf_uf = f"(SELECT tf_uf from dim_uf_2020 where uf = '{r['NO_UF']}') AS tf_uf" if r[
-    #         'NO_UF'] else f"(SELECT Null from dim_uf_2020 where uf = '{r['NO_UF']}') AS tf_uf"
-    #     subquery_tf_ies = f"(SELECT tf_ies from dim_ies_2020 where ies = '{no_ies}') AS tf_ies"
-    #     subquery_tf_curso = f"(SELECT tf_curso from dim_curso_2020 where curso = '{r['NO_CURSO']}') AS tf_curso"
-    #
-    #     insert_statement = f"""INSERT INTO fact_matriculas (matriculas, tf_curso, tf_ano, tf_modalidade, tf_municipio, tf_uf, tf_ies)
-    #                             SELECT DISTINCT * from
-    #                             {subquery_matriculas},
-    #                             {subquery_tf_curso},
-    #                             {subquery_tf_ano},
-    #                             {subquery_tf_modalidade},
-    #                             {subquery_tf_municipio},
-    #                             {subquery_tf_uf},
-    #                             {subquery_tf_ies};
-    #                         """
-    #
-    #     print(insert_statement)
-    #     cursor.execute(insert_statement)
-    #     conn.commit()
+    dados_curso = pd.DataFrame(dados['NO_CURSO'].unique(), columns=['CURSO'])
+    for i, r in dados_curso.iterrows():
+        insert_statement = f"INSERT INTO dim_curso (tf_curso, curso) VALUES ({i}, '{r['CURSO']}')"
+        print(insert_statement)
+        cursor.execute(insert_statement)
+        conn.commit()
+
+    # ===== ANO =====
+
+    dados_ano = pd.DataFrame(dados['NU_ANO_CENSO'].unique(), columns=['ANO'])
+    for i, r in dados_ano.iterrows():
+        insert_statement = f"INSERT INTO dim_ano (tf_ano, ano) VALUES ({i}, {r['ANO']})"
+        print(insert_statement)
+        cursor.execute(insert_statement)
+        conn.commit()
+
+    # ===== TABELA FATO =====
+
+    for i, r in dados.iterrows():
+        modalidade = 'Presencial' if r['TP_MODALIDADE_ENSINO'] == 1 else 'EAD'
+        dados_ies_filtrado = dados_ies[dados_ies['CO_IES'] == r['CO_IES']]
+        no_ies = dados_ies_filtrado['NO_IES'].iloc[0].replace("'", " ")
+        municipio = str(r['NO_MUNICIPIO']).replace("'", " ")
+
+        subquery_matriculas = f"(SELECT {r['QT_INSCRITO_TOTAL']}) as matriculas"
+        subquery_tf_ano = f"(SELECT tf_ano from dim_ano where ano = {r['NU_ANO_CENSO']}) AS tf_ano"
+        subquery_tf_modalidade = f"(SELECT tf_modalidade from dim_modalidade where modalidade = '{modalidade}') AS tf_modalidade"
+        subquery_tf_municipio = f"(SELECT tf_municipio from dim_municipio where municipio = '{municipio}') AS tf_municipio" \
+            if r[
+            'NO_MUNICIPIO'] else f"(SELECT Null from dim_municipio where municipio = '{r['NO_MUNICIPIO']}') AS tf_municipio"
+        subquery_tf_uf = f"(SELECT tf_uf from dim_uf where uf = '{r['NO_UF']}') AS tf_uf" if r[
+            'NO_UF'] else f"(SELECT Null from dim_uf where uf = '{r['NO_UF']}') AS tf_uf"
+        subquery_tf_ies = f"(SELECT tf_ies from dim_ies where ies = '{no_ies}') AS tf_ies"
+        subquery_tf_curso = f"(SELECT tf_curso from dim_curso where curso = '{r['NO_CURSO']}') AS tf_curso"
+
+        insert_statement = f"""INSERT INTO fact_matriculas (matriculas, tf_curso, tf_ano, tf_modalidade, tf_municipio, tf_uf, tf_ies)
+                                SELECT DISTINCT * from
+                                {subquery_matriculas},
+                                {subquery_tf_curso},
+                                {subquery_tf_ano},
+                                {subquery_tf_modalidade},
+                                {subquery_tf_municipio},
+                                {subquery_tf_uf},
+                                {subquery_tf_ies};
+                            """
+
+        print(insert_statement)
+        cursor.execute(insert_statement)
+        conn.commit()
 
     # ============== 2021 =================
 
@@ -185,7 +173,7 @@ try:
     for i, r in dados_ies_curso.iterrows():
         dados_ies_filtrado = dados_ies[dados_ies['CO_IES'] == r['IES']]
         dados_filrados = dados_ies_filtrado['NO_IES'].iloc[0].replace("'", " ")
-        select_statement = f'SELECT COUNT(*) FROM dim_municipio WHERE municipio = \'{dados_filrados}\''
+        select_statement = f'SELECT COUNT(*) FROM dim_ies WHERE ies = \'{dados_filrados}\''
         cursor.execute(select_statement)
         result = cursor.fetchone()
 
@@ -228,6 +216,75 @@ try:
                 conn.commit()
             else:
                 print(f'Modalidade \'{modalidade}\' já existe na tabela dim_modalidade.')
+
+        cursor.execute(insert_statement)
+        conn.commit()
+
+    # ===== CURSO =====
+
+    dados_curso = pd.DataFrame(dados['NO_CURSO'].unique(), columns=['CURSO'])
+    for i, r in dados_curso.iterrows():
+        curso = r['CURSO'].replace("'", " ")
+        select_statement = f'SELECT COUNT(*) FROM dim_curso WHERE curso = \'{curso}\''
+        cursor.execute(select_statement)
+        result = cursor.fetchone()
+
+        if result[0] == 0:
+            insert_statement = f"INSERT INTO dim_curso (tf_curso, curso) VALUES ({i}, '{curso}')"
+            print(insert_statement)
+            cursor.execute(insert_statement)
+            conn.commit()
+
+        else:
+            print(f'Curso \'{curso}\' já existe na tabela dim_curso.')
+
+    # ===== ANO =====
+
+    dados_ano = pd.DataFrame(dados['NU_ANO_CENSO'].unique(), columns=['ANO'])
+    for i, r in dados_ano.iterrows():
+        ano = r['ANO']
+        select_statement = f'SELECT COUNT(*) FROM dim_ano WHERE ano = {ano}'
+        cursor.execute(select_statement)
+        result = cursor.fetchone()
+
+        if result[0] == 0:
+            insert_statement = f"INSERT INTO dim_ano (tf_ano, ano) VALUES ({i + 1}, {ano})"
+            print(insert_statement)
+            cursor.execute(insert_statement)
+            conn.commit()
+
+        else:
+            print(f'Ano \'{ano}\' já existe na tabela dim_ano.')
+
+    # ===== TABELA FATO =====
+
+    for i, r in dados.iterrows():
+        modalidade = 'Presencial' if r['TP_MODALIDADE_ENSINO'] == 1 else 'EAD'
+        dados_ies_filtrado = dados_ies[dados_ies['CO_IES'] == r['CO_IES']]
+        no_ies = dados_ies_filtrado['NO_IES'].iloc[0].replace("'", " ")
+        municipio = str(r['NO_MUNICIPIO']).replace("'", " ")
+
+        subquery_matriculas = f"(SELECT {r['QT_INSCRITO_TOTAL']}) as matriculas"
+        subquery_tf_ano = f"(SELECT tf_ano from dim_ano where ano = {r['NU_ANO_CENSO']}) AS tf_ano"
+        subquery_tf_modalidade = f"(SELECT tf_modalidade from dim_modalidade where modalidade = '{modalidade}') AS tf_modalidade"
+        subquery_tf_municipio = f"(SELECT tf_municipio from dim_municipio where municipio = '{municipio}') AS tf_municipio" \
+            if r[
+            'NO_MUNICIPIO'] else f"(SELECT Null from dim_municipio where municipio = '{r['NO_MUNICIPIO']}') AS tf_municipio"
+        subquery_tf_uf = f"(SELECT tf_uf from dim_uf where uf = '{r['NO_UF']}') AS tf_uf" if r[
+            'NO_UF'] else f"(SELECT Null from dim_uf where uf = '{r['NO_UF']}') AS tf_uf"
+        subquery_tf_ies = f"(SELECT tf_ies from dim_ies where ies = '{no_ies}') AS tf_ies"
+        subquery_tf_curso = f"(SELECT tf_curso from dim_curso where curso = '{r['NO_CURSO']}') AS tf_curso"
+
+        insert_statement = f"""INSERT INTO fact_matriculas (matriculas, tf_curso, tf_ano, tf_modalidade, tf_municipio, tf_uf, tf_ies)
+                                SELECT DISTINCT * from
+                                {subquery_matriculas},
+                                {subquery_tf_curso},
+                                {subquery_tf_ano},
+                                {subquery_tf_modalidade},
+                                {subquery_tf_municipio},
+                                {subquery_tf_uf},
+                                {subquery_tf_ies};
+                            """
 
         print(insert_statement)
         cursor.execute(insert_statement)
