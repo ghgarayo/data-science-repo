@@ -9,10 +9,10 @@ config = {
     "port": "3306"
 }
 
-dados_curso_2020 = "X:/Faculdade/2023.2/Data Science/docs/MICRODADOS_CADASTRO_CURSOS_2020.CSV"
-dados_ies_2020 = "X:/Faculdade/2023.2/Data Science/docs/MICRODADOS_CADASTRO_IES_2020.CSV"
-dados_curso_2021 = "X:/Faculdade/2023.2/Data Science/docs/MICRODADOS_CADASTRO_CURSOS_2021.CSV"
-dados_ies_2021 = "X:/Faculdade/2023.2/Data Science/docs/MICRODADOS_CADASTRO_IES_2021.CSV"
+dados_curso_2020 = "E:/Faculdade/02.23/Data_Science/docs/MICRODADOS_CADASTRO_CURSOS_2020.CSV"
+dados_ies_2020 = "E:/Faculdade/02.23/Data_Science/docs/MICRODADOS_CADASTRO_IES_2020.CSV"
+dados_curso_2021 = "E:/Faculdade/02.23/Data_Science/docs/MICRODADOS_CADASTRO_CURSOS_2021.CSV"
+dados_ies_2021 = "E:/Faculdade/02.23/Data_Science/docs/MICRODADOS_CADASTRO_IES_2021.CSV"
 
 conn = None
 
@@ -192,30 +192,24 @@ try:
         modalidade = r['MODALIDADE']
 
         if modalidade == 1:
-            select_statement = f'SELECT COUNT(*) FROM dim_modalidade WHERE modalidade = \'{modalidade}\''
+            select_statement = f"SELECT COUNT(*) FROM dim_modalidade WHERE modalidade = 'Presencial'"
             cursor.execute(select_statement)
             result = cursor.fetchone()
 
             if result[0] == 0:
                 insert_statement = f"INSERT INTO dim_modalidade (tf_modalidade, modalidade) VALUES ('{modalidade}', 'Presencial')"
-                print(insert_statement)
-                cursor.execute(insert_statement)
-                conn.commit()
             else:
-                print(f'Modalidade\'{modalidade}\' já existe na tabela dim_modalidade.')
+                print(f'Modalidade Presencial já existe na tabela dim_modalidade.')
 
         elif modalidade == 2:
-            select_statement = f'SELECT COUNT(*) FROM dim_modalidade WHERE modalidade = \'{modalidade}\''
+            select_statement = f"SELECT COUNT(*) FROM dim_modalidade WHERE modalidade = 'EAD'"
             cursor.execute(select_statement)
             result = cursor.fetchone()
 
             if result[0] == 0:
                 insert_statement = f"INSERT INTO dim_modalidade (tf_modalidade, modalidade) VALUES (\'{modalidade}\', 'EAD')"
-                print(insert_statement)
-                cursor.execute(insert_statement)
-                conn.commit()
             else:
-                print(f'Modalidade \'{modalidade}\' já existe na tabela dim_modalidade.')
+                print(f'Modalidade EAD já existe na tabela dim_modalidade.')
 
         cursor.execute(insert_statement)
         conn.commit()
@@ -268,8 +262,7 @@ try:
         subquery_tf_ano = f"(SELECT tf_ano from dim_ano where ano = {r['NU_ANO_CENSO']}) AS tf_ano"
         subquery_tf_modalidade = f"(SELECT tf_modalidade from dim_modalidade where modalidade = '{modalidade}') AS tf_modalidade"
         subquery_tf_municipio = f"(SELECT tf_municipio from dim_municipio where municipio = '{municipio}') AS tf_municipio" \
-            if r[
-            'NO_MUNICIPIO'] else f"(SELECT Null from dim_municipio where municipio = '{r['NO_MUNICIPIO']}') AS tf_municipio"
+            if r['NO_MUNICIPIO'] else f"(SELECT Null from dim_municipio where municipio = '{r['NO_MUNICIPIO']}') AS tf_municipio"
         subquery_tf_uf = f"(SELECT tf_uf from dim_uf where uf = '{r['NO_UF']}') AS tf_uf" if r[
             'NO_UF'] else f"(SELECT Null from dim_uf where uf = '{r['NO_UF']}') AS tf_uf"
         subquery_tf_ies = f"(SELECT tf_ies from dim_ies where ies = '{no_ies}') AS tf_ies"
