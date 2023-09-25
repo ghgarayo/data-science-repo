@@ -34,7 +34,7 @@ CREATE TABLE dim_curso (
 );
 
 CREATE TABLE fact_matriculas (
-    matricula INT,
+    matriculas INT,
     tf_ano BIGINT,
     tf_modalidade BIGINT,
     tf_municipio BIGINT,
